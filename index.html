@@ -18,6 +18,7 @@
             width: 100%;
             position: absolute;
         }
+
     </style>
   </head>
 
@@ -29,17 +30,19 @@
 
     <!-- Main tangram library -->
     <script src="https://mapzen.com/tangram/0.10/tangram.min.js"></script>
+    <script src="leaflet-hash.js"></script>
 
     <!-- Demo setup -->
     <script>
 
         var map = L.map('map');
         var layer = Tangram.leafletLayer({
-            scene: 'scene.yaml',
+            scene: 'scene2.yaml',
             attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>'
         });
         layer.addTo(map);
-        map.setView([40.70531887544228, -74.00976419448853], 15);
+        var hash = new L.Hash(map);
+        map.setView([40.70531887544228, -74.00976419448853], 5);
     </script>
 
   </body>

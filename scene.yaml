@@ -1,0 +1,98 @@
+import:
+    - https://tangrams.github.io/blocks/global.yaml
+    - https://tangrams.github.io/blocks/filter/height.yaml
+    - https://tangrams.github.io/blocks/patterns/stripes.yaml
+    - https://tangrams.github.io/blocks/filter/grain.yaml
+    - https://tangrams.github.io/blocks/space/constant.yaml
+    - https://tangrams.github.io/blocks/space/screen.yaml
+
+sources:
+    mapzen:
+        type: TopoJSON
+        url:  https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
+        rasters: [normals]
+        max_zoom: 16
+    normals:
+        type: Raster
+        url: https://tile.mapzen.com/mapzen/terrain/v1/normal/{z}/{x}/{y}.png?api_key=vector-tiles-VyYjZGS
+        max_zoom: 15
+textures:
+    waves:
+        url: img/seigaiha.png
+scene:
+    background:
+      color: grey
+
+layers:
+    water:
+        data: { source: mapzen }
+        filter:
+          not:
+            - boundary: true
+            - kind: playa
+        draw:
+          waves:
+            order: 100
+    earth:
+        data: { source: mapzen }
+        filter: { not: { boundary: true } }
+        draw:
+            terrain:
+                order: 200
+styles:
+    palette:
+        shaders:
+            blocks:
+                global: |
+                    float radio = 0.05;
+                    vec2 size = vec2(1.,.6);
+                    vec3 background = vec3(1.);
+                    vec3 middle = vec3(0.824, 0.812, 0.804);
+                    vec3 foreground = vec3(0.275,0.298,0.251);
+    roads:
+        base: lines
+        lighting: false
+    waves:
+        base: polygons
+        texture: waves
+
+    buildings:
+        base: polygons
+        mix: [filter-height]
+    dash:
+        base: lines
+        dash: [1, 2]
+    terrain:
+        base: polygons
+        lighting: false
+        raster: normal
+        shaders:
+            uniforms:
+                # u_envmap: images/relief-shading-environment-map.jpg
+                u_envmap: img/draw-test9.jpg
+                u_contrast: 1.
+                u_brightness: 1.
+            blocks:
+                global: |
+                    vec4 terrainEnvmap (in sampler2D _tex, in vec3 _normal) {
+                        const vec3 eye = vec3(0.,0.,-1.);
+                        vec3 r = reflect(eye, _normal);
+                        r.z += 1.;
+                        float m = 2. * length(r);
+                        vec2 uv = r.xy / m + .5;
+                        return texture2D(_tex, uv);
+                    }
+                    const float e = 2.71828;
+                color: |
+                    float scale1 = 20./(u_map_position.z) + 1.5;
+                    normal.z /= scale1;
+                    float m = 3.5 * (u_map_position.z - 0.8) * pow(e, u_map_position.z * -.29);
+                    m = clamp(m, 0., 1.5);
+                    color = terrainEnvmap(u_envmap, normal);
+
+                    float contrast = m;
+                    color.rgb = ((color.rgb - 0.5) * max(contrast, 0.)) + 0.5;
+                    float brightness = .5 - m * .5;
+                    color.rgb += brightness;
+
+                    color *= v_color; // apply layer color
