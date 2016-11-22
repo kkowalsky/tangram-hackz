@@ -5,24 +5,35 @@ sources:
         max_zoom: 16
 textures:
     waves:
-        url: img/seigaiha.png
+        url: https://dl.dropboxusercontent.com/u/335522/seigaiha.png
 layers:
     water:
         data: { source: mapzen }
         filter:
-          not:
-            - boundary: true
-            - kind: playa
+            not:
+                - boundary: true
+                - kind: playa
         draw:
-          waves:
-            order: 100
+            polygons:
+                style: waves
+                order: 100
+                color: white
     earth:
         data: { source: mapzen }
         filter: { not: { boundary: true } }
         draw:
           polygons:
-            color: white
+            color: gray
 styles:
+    roads:
+        base: lines
+        lighting: false
     waves:
         base: polygons
-        texture: waves
+        material:
+            diffuse:
+                texture: waves
+                mapping: uv
+    dash:
+        base: lines
+        dash: [1, 2]
