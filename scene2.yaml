@@ -23,12 +23,6 @@ layers:
           polygons:
             color: white
 styles:
-    roads:
-        base: lines
-        lighting: false
     waves:
         base: polygons
         texture: waves
-    dash:
-        base: lines
-        dash: [1, 2]
