@@ -33,7 +33,8 @@ styles:
         material:
             diffuse:
                 texture: waves
-                mapping: uv
+                mapping: planer
+                scale: 1.0
     dash:
         base: lines
         dash: [1, 2]
