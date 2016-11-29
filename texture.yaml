@@ -1,3 +1,5 @@
+import:
+    - https://tangrams.github.io/blocks/space/tile-full.yaml
 sources:
     mapzen:
         type: TopoJSON
@@ -5,7 +7,7 @@ sources:
         max_zoom: 16
 textures:
     waves:
-        url: https://dl.dropboxusercontent.com/u/335522/seigaiha.png
+        url: 'img/seigaiha_blue.png'
 layers:
     water:
         data: { source: mapzen }
@@ -17,24 +19,28 @@ layers:
             polygons:
                 style: waves
                 order: 100
-                color: white
+                color: gray
     earth:
         data: { source: mapzen }
         filter: { not: { boundary: true } }
         draw:
           polygons:
-            color: gray
+            color: '#E8DEC6'
 styles:
     roads:
         base: lines
         lighting: false
     waves:
         base: polygons
-        material:
-            diffuse:
-                texture: waves
-                mapping: planer
-                scale: 1.0
+        mix: [space-tile]
+        texcoords: true
+        shaders:
+            uniforms:
+                u_pattern: waves
+            blocks:
+                color: |
+                    vec2 st = getTileCoords();
+                    color = texture2D(u_pattern,st);
     dash:
         base: lines
         dash: [1, 2]
