@@ -1,0 +1,35 @@
+# The sources section is a require block where the spatial data and its type is referenced
+sources:
+    mapzen:
+        type: TopoJSON
+        url: https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
+# The layers section is a required block that determines what is being drawn
+layers:
+    #this layer is referencing the 'earth' layer in Mapzen's Vector Tiles
+    earth:
+        # sets the data as coming from the source described above
+        # this layer is the same name as a layer in the 'mapzen' source so that is how the data is being filtered
+        data: { source: mapzen }
+        # draw is a block that sets the styles for this layer
+        draw:
+            # polygons is a reserve word in YAML that sets a specific draw style to that type of feature
+            polygons:
+                # order is required to set how we want our map to be drawn
+                order: 0
+                # color is the only requirement for a 'polygons' draw style, in this case we're using the color preset of 'darkgreen'
+                color: darkgreen
+    water:
+        data: { source: mapzen }
+        filter:
+        draw:
+            polygons:
+                order: 1
+                color: lightblue
+    roads:
+        data: { source: mapzen }
+        draw:
+            # lines is like the polygons key word, except requires a color and a line width
+            lines:
+                order: 2
+                color: white
+                width: 1.5px
