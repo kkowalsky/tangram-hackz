@@ -1,0 +1,261 @@
+sources:
+    mapzen:
+        type: TopoJSON
+        url: https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson
+scene:
+    background:
+        color: white
+fonts:
+    Lora:
+        - weight: 700
+          url: https://fonts.gstatic.com/s/lora/v9/mlTYdpdDwCepOR2s5kS2CwLUuEpTyoUstqEm5AMlJo4.woff2
+        - weight: 700
+          style: italic
+          url: https://fonts.gstatic.com/s/lora/v9/_IxjUs2lbQSu0MyFEAfa7ZBw1xU1rKptJj_0jans920.woff2
+    Roboto:
+        - weight: 400
+          url: https://fonts.gstatic.com/s/roboto/v15/CrYjSnGjrRCn0pd9VQsnFOvvDin1pK8aKteLpeZ5c0A.woff
+        - weight: 500
+          style: italic
+          url: https://fonts.gstatic.com/s/roboto/v15/OLffGBTaF0XFOW1gnuHF0brIa-7acMAeDBVuclsi6Gc.woff
+textures:
+    pois:
+        url: https://raw.githubusercontent.com/tangrams/cartography-docs/master/img/sprite/bubble-wrap-style/2x/capital-m.png
+layers:
+    _earthLayer:
+        data:
+            source: mapzen
+            layer: earth
+        draw:
+            polygons:
+                order: 0
+                color: [1.000,0.923,0.844,1.0]
+        _earthLabels:
+            filter:
+                all:
+                    - kind: [continent]
+                    - name: true
+                    - $zoom: { max: 5 }
+            draw:
+                text:
+                    text_source: function() { return feature["name:en"] || feature["name"]; }
+                    font:
+                        family: Roboto
+                        style: italic
+                        size: [[1,18px],[2,20px],[3,24px],[4,32px]]
+                        fill: [0.776, 0.655, 0.565, 1.00]
+                        transform: uppercase
+    _waterLayer:
+        data:
+            source: mapzen
+            layer: water
+        filter:
+            kind: [ocean, river, sea, lake]
+        draw:
+            polygons:
+                order: 1
+                color: [0.337, 0.463, 0.537, 0.89]
+        _waterlines:
+            filter: { boundary: true, kind: [ocean] }
+            draw:
+                lines:
+                    order: 2
+                    color: [0.400,0.515,0.574,1.0]
+                    width: 3px
+                    join: round
+                    cap: round
+        _oceanLabel:
+            filter: { kind: ocean }
+            draw:
+                text:
+                    font:
+                        family: Lora
+                        size: 24pt
+                        style: italic
+                        fill: [0.308,0.396,0.441,1.0]
+        _seasLabel:
+            filter: { kind: sea, $zoom: { min: 7 } }
+            draw:
+                text:
+                    font:
+                        family: Lora
+                        size: 12pt
+                        style: italic
+    _boundaries:
+        data:
+            source: mapzen
+            layer: boundaries
+        _countries:
+            filter:
+                all:
+                    - kind: country
+                not:
+                    - maritime_boundary: true
+            draw:
+                lines:
+                    order: 5
+                    color: [1.000, 1.000, 1.000, 1.00]
+                    width: [[2,1px],[4,1.5px],[5,3px],[10,3.5px]]
+        _regions:
+            filter:
+                all:
+                    - kind: region
+                    - $zoom: { min: 5 }
+                not:
+                    - maritime_boundary: true
+            draw:
+                lines:
+                    order: 5
+                    color: [1.000, 1.000, 1.000, 1.00]
+                    width: 1.5px
+    _countryLabels:
+        data:
+            source: mapzen
+            layer: places
+        _countryZoom2:
+            filter:
+                all:
+                    - kind: country
+                    - $zoom: [2]
+                    - name: ["United States of America","Brasil","中华人民共和国","Россия","Canada","Kalaallit Nunaat","Ísland","Australia","India","日本","Guam","Indonesia","South Africa","مصر","Nigeria","Kenya"]
+            draw:
+                text:
+                    text_source: function() { return feature["name:en"] || feature["name"]; }
+                    font:
+                        family: Lora
+                        weight: 700
+                        size: 18px
+                        fill: [0.149,0.149,0.152,1.0]
+                        stroke:
+                            color: [1.000,0.923,0.844,1.0]
+                            width: 2
+                    order: 7
+        _countryZoom3OrHigher:
+             filter:
+                    all:
+                        - kind: country
+             _largeCountries:
+                 filter:
+                     all:
+                         - population: { min: 30000000 }
+                         - $zoom: { min: 3 }
+                 draw:
+                     text:
+                         text_source: function() { return feature["name:en"] || feature["name"]; }
+                         font:
+                             family: Lora
+                             weight: 700
+                             size:  [[3,16px],[4,18px],[5,24px],[8,44px]]
+                             fill: [0.149,0.149,0.152,1.0]
+                             stroke:
+                                 color: [1.000,0.923,0.844,1.0]
+                                 width: [[3,1px],[8,4px]]
+                         order: 7
+             _mediumCountries:
+                 filter:
+                    all:
+                        - population: { min: 15000000, max: 29000000 }
+                        - $zoom: { min: 4 }
+                 draw:
+                     text:
+                         text_source: function() { return feature["name:en"] || feature["name"]; }
+                         font:
+                             family: Lora
+                             weight: 700
+                             size: [[4,16px],[5,20px],[8,28px]]
+                             fill: [0.149,0.149,0.152,1.0]
+                             stroke:
+                                 color: [1.000,0.923,0.844,1.0]
+                                 width: [[4,2px],[8,3px]]
+                         order: 7
+             _smallCountries:
+                 filter:
+                    all:
+                        - population: { min: 5000000, max: 14000000 }
+                        - $zoom: { min: 4 }
+                 draw:
+                     text:
+                         text_source: function() { return feature["name:en"] || feature["name"]; }
+                         font:
+                             family: Lora
+                             weight: 700
+                             size: [[4,14px],[5,18px],[8,24px]]
+                             fill: [0.149,0.149,0.152,1.0]
+                             stroke:
+                                 color: [1.000,0.923,0.844,1.0]
+                                 width: [[4,2px],[8,3px]]
+                         order: 7
+             _verySmallCountries:
+                 filter:
+                    all:
+                        - population: { max: 4900000 }
+                        - $zoom: { min: 5 }
+                 draw:
+                     text:
+                         text_source: function() { return feature["name:en"] || feature["name"]; }
+                         font:
+                             family: Lora
+                             weight: 700
+                             size: [[5,18px],[8,24px]]
+                             fill: [0.149,0.149,0.152,1.0]
+                             stroke:
+                                 color: [1.000,0.923,0.844,1.0]
+                                 width: [[5,2px],[8,3px]]
+                         order: 7
+    _landuseLayer:
+        data:
+            source: mapzen
+            layer: landuse
+        _forest:
+            filter: { kind: forest }
+            draw:
+                polygons:
+                    order: 4
+                    color: [0.630,0.764,0.635,1.0]
+        _wood:
+            filter:
+                all:
+                    - kind: [national_park, park]
+            draw:
+                polygons:
+                    order: 1
+                    color: [0.813,0.878,0.770,1.0]
+        _conservation:
+            filter:
+                - kind: [protected_area, nature_reserve, national_park]
+            draw:
+                polygons:
+                    order: 1
+                    color: [0.659,0.800,0.667,1.0]
+        _urban:
+            filter: { kind: urban_area }
+            draw:
+                polygons:
+                    order: 5
+                    color: [0.800,0.800,0.792,1.0]
+    _citiesLayer:
+        data:
+            source: mapzen
+            layer: places
+        filter: { country_capital: true, kind_detail: city  }
+        draw:
+            icons:
+                order: 100
+                size: 10px
+                text:
+                    font:
+                        family: Roboto
+                        weight: 400
+                        size: [[2,28px],[8,24px]]
+                        fill: [0.149,0.149,0.152,1.0]
+                        order: 10
+            text:
+                order: 101
+                font:
+                    size: 10px
+                    fill: black
+styles:
+    icons:
+        base: points
+        blend_order: 1
+        texture: pois
