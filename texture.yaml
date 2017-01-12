@@ -1,13 +1,9 @@
-import:
-    - https://tangrams.github.io/blocks/space/tile-full.yaml
+
 sources:
     mapzen:
         type: TopoJSON
         url:  https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
         max_zoom: 16
-textures:
-    waves:
-        url: 'img/seigaiha_blue.png'
 layers:
     water:
         data: { source: mapzen }
@@ -16,8 +12,7 @@ layers:
                 - boundary: true
                 - kind: playa
         draw:
-            polygons:
-                style: waves
+            waves:
                 order: 100
                 color: gray
     earth:
@@ -32,15 +27,11 @@ styles:
         lighting: false
     waves:
         base: polygons
-        mix: [space-tile]
-        texcoords: true
-        shaders:
-            uniforms:
-                u_pattern: waves
-            blocks:
-                color: |
-                    vec2 st = getTileCoords();
-                    color = texture2D(u_pattern,st);
+        material:
+            diffuse:
+                texture: 'img/seigaiha_blue.png'
+                mapping: planar
+                scale: 0.0000003
     dash:
         base: lines
         dash: [1, 2]
