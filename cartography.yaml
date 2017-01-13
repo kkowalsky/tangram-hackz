@@ -19,39 +19,15 @@ fonts:
           style: italic
           url: https://fonts.gstatic.com/s/roboto/v15/OLffGBTaF0XFOW1gnuHF0brIa-7acMAeDBVuclsi6Gc.woff
 textures:
-    # my add to show 2nd texture
-    townspot:
+    city:
         url: https://raw.githubusercontent.com/tangrams/cartography-docs/master/img/sprite/bubble-wrap-style/2x/townspot-s-rev.png
-    # your original
     capital:
         url: https://raw.githubusercontent.com/tangrams/cartography-docs/master/img/sprite/bubble-wrap-style/2x/capital-m.png
-    # my add to show N textures
-    icons:
-        url: https://raw.githubusercontent.com/tangrams/bubble-wrap/gh-pages/images/bubble-wrap%402x.png
-        filtering: mipmap
-        sprites:
-            # define sprites: [x origin, y origin, width, height]
-            #capital-l: [726, 246, 32, 32]
-            capital-m: [694, 246, 24, 24]
-            #capital-s: [666, 246, 20, 20]
-            #capital-xl: [814, 246, 40, 40]
-            #capital-xs: [642, 246, 16, 16]
-            #townspot-l: [132, 288, 32, 32]
-            #townspot-l-rev: [942, 246, 32, 32]
-            #townspot-m: [100, 288, 24, 24]
-            #townspot-m-rev: [910, 246, 24, 24]
-            #townspot-s: [72, 288, 20, 20]
-            townspot-s-rev: [882, 246, 20, 20]
-            #townspot-xl: [172, 288, 40, 40]
-            #townspot-xl-rev: [0, 290, 40, 40]
-            #townspot-xs: [48, 288, 16, 16]
-            #townspot-xs-rev: [862, 246, 12, 12]
 layers:
     _earthLayer:
         data:
             source: mapzen
             layer: earth
-        # for performance reasons it'd be better to set this as a scene color (but keep the labels parts)
         draw:
             polygons:
                 order: 0
@@ -109,8 +85,6 @@ layers:
             filter:
                 all:
                     - kind: country
-                    #- maritime_boundary: false
-                # this is better stated as a false in an all
                 not:
                     - maritime_boundary: true
             draw:
@@ -130,8 +104,6 @@ layers:
                 all:
                     - kind: region
                     - $zoom: { min: 5 }
-                    #- maritime_boundary: false
-                # this is better stated as a false in an all
                 not:
                     - maritime_boundary: true
             draw:
@@ -145,7 +117,8 @@ layers:
             layer: places
         _countryLabels:
              filter:
-                kind: country
+                    all:
+                        - kind: country
              _largeCountries:
                  filter:
                      all:
@@ -224,21 +197,14 @@ layers:
                 polygons:
                     order: 4
                     color: [0.630,0.764,0.635,1.0]
-        # inconsistent layer name (suggest _park)
         _wood:
             filter:
                 all:
                     - kind: [national_park, park]
-                # alternatively, with or without the all:
-                #kind:
-                #    - natinoal_park
-                #    - park
             draw:
                 polygons:
                     order: 1
                     color: [0.813,0.878,0.770,1.0]
-        # this is from an old Mapzen basemap style, there is no kind called conservation
-        # also, note duplicate national_park in your kind list with _wood layer above
         _conservation:
             filter:
                 - kind: [protected_area, nature_reserve, national_park]
@@ -250,7 +216,6 @@ layers:
             filter:
                 all:
                     - kind: urban_area
-                    # this doesn't show up in the data past zoom 8?
                     - $zoom: { max: 8 }
             draw:
                 polygons:
@@ -260,67 +225,34 @@ layers:
         data:
             source: mapzen
             layer: places
-        filter:
-            kind: locality
-        draw:
-            icons:
-                size: 8px
-                # the priority here is 2 so it's "worse" than 1
-                # used for _capitals below
-                priority: 2
-                sprite: townspot-s-rev
-                text:
-                    font:
-                        family: Roboto
-                        weight: 400
-                        # very large text sizes at (any) zoom
-                        # will collide with Tangram tile boundaries
-                        # and be removed from display, sad
-                        # so I've shrunk your text size significantly
-                        size: [[2,10px],[8,24px]]
-                        fill: [0.149,0.149,0.152,1.0]
-            # townspot:
-            #     size: 10px
-            #     priority: 2
-            #     text:
-            #         font:
-            #             family: Roboto
-            #             weight: 400
-            #             size: [[2,10px],[8,24px]]
-            #             fill: [0.149,0.149,0.152,1.0]
         _capitals:
-            filter: { country_capital: true }
+            filter: { country_capital: true, kind: locality }
             draw:
-                icons:
-                    # the earlier setup with both country_capital and zoom
-                    # made it so the capitals were often collided out
-                    # so I've separated the icon sprite change to _later block
+                capital:
+                    order: 200
                     priority: 1
-                    size: 10px
-
-                # townspot:
-                #     priority: 1
-            _later:
-                filter: { $zoom: { min: 5 } }
-                draw:
-                    icons:
-                        sprite: capital-m
-                #
-                # using different icons via texture only
-                # leads to need to turn symbolizers off and on, sad
-                # so icons sets sprite lookup off big spritesheet
-                #
-                #     townspot:
-                #         visible: false
-                #     capital:
-                #         size: 10px
-                #         priority: 1
-                #         text:
-                #             font:
-                #                 family: Roboto
-                #                 weight: 400
-                #                 size: [[2,14px],[8,24px]]
-                #                 fill: [0.149,0.149,0.152,1.0]
+                    size: 12px
+                    text:
+                        font:
+                            family: Roboto
+                            weight: 400
+                            size: [[2,10px],[8,24px]]
+                            fill: [0.149,0.149,0.152,1.0]
+                            order: 10
+        _cities:
+            filter: { country_capital: false, kind: locality, $zoom: { min: 5 }  }
+            draw:
+                city:
+                    order: 100
+                    priority: 2
+                    size: 8px
+                    text:
+                        font:
+                            family: Roboto
+                            weight: 400
+                            size: [[2,8px],[8,20px]]
+                            fill: [0.149,0.149,0.152,1.0]
+                            order: 10
     _roadsLayer:
         data:
             source: mapzen
@@ -359,17 +291,12 @@ layers:
                 color: [0.859,0.855,0.854,1.0]
                 extrude: true
 styles:
-    townspot:
+    city:
         base: points
-        texture: townspot
-    # added to illustrate 2nd texture
+        texture: city
     capital:
         base: points
         texture: capital
-    # added to illustrate N textures
-    icons:
-        base: points
-        texture: icons
     dashed:
         base: lines
         dash: [2,1]
