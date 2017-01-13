@@ -38,7 +38,6 @@ layers:
                     - $zoom: { max: 5 }
             draw:
                 text:
-                    text_source: function() { return feature["name:en"] || feature["name"]; }
                     font:
                         family: Roboto
                         style: italic
@@ -56,7 +55,10 @@ layers:
                 order: 1
                 color: [0.337, 0.463, 0.537, 0.89]
         _waterlines:
-            filter: { boundary: true, kind: [ocean] }
+            filter:
+                all:
+                    - boundary: true
+                    - kind: [ocean]
             draw:
                 lines:
                     order: 2
@@ -70,17 +72,9 @@ layers:
                 text:
                     font:
                         family: Lora
-                        size: [[2,18px],[],[]]
+                        size: [[1,12px],[3,24px],[7,36px]]
                         style: italic
                         fill: [0.308,0.396,0.441,1.0]
-        _seasLabel:
-            filter: { kind: sea, $zoom: { min: 7 } }
-            draw:
-                text:
-                    font:
-                        family: Lora
-                        size: 12pt
-                        style: italic
     _boundaries:
         data:
             source: mapzen
@@ -96,6 +90,13 @@ layers:
                     order: 5
                     color: [1.000, 1.000, 1.000, 1.00]
                     width: [[2,1px],[4,1.5px],[5,3px],[10,3.5px]]
+        _disputed:
+            filter: { kind: [disputed, indefinite, indeterminate, lease_limit, line_of_control, overlay_limit] }
+            draw:
+                dashed:
+                    order: 5
+                    color: [1.000, 1.000, 1.000, 1.00]
+                    width: 1.5px
         _regions:
             filter:
                 all:
@@ -112,25 +113,7 @@ layers:
         data:
             source: mapzen
             layer: places
-        _countryZoom2:
-            filter:
-                all:
-                    - kind: country
-                    - $zoom: [2]
-                    - name: ["United States of America","Brasil","中华人民共和国","Россия","Canada","Kalaallit Nunaat","Ísland","Australia","India","日本","Guam","Indonesia","South Africa","مصر","Nigeria","Kenya"]
-            draw:
-                text:
-                    text_source: function() { return feature["name:en"] || feature["name"]; }
-                    font:
-                        family: Lora
-                        weight: 700
-                        size: 18px
-                        fill: [0.149,0.149,0.152,1.0]
-                        stroke:
-                            color: [1.000,0.923,0.844,1.0]
-                            width: 2
-                    order: 7
-        _countryZoom3OrHigher:
+        _countryLabels:
              filter:
                     all:
                         - kind: country
@@ -228,34 +211,96 @@ layers:
                     order: 1
                     color: [0.659,0.800,0.667,1.0]
         _urban:
-            filter: { kind: urban_area }
+            filter:
+                all:
+                    - kind: urban_area
+                    - $zoom: { max: 8 }
             draw:
                 polygons:
-                    order: 5
+                    order: 3
                     color: [0.800,0.800,0.792,1.0]
     _citiesLayer:
         data:
             source: mapzen
             layer: places
-        filter: { country_capital: true, kind_detail: city  }
-        draw:
-            icons:
-                order: 100
-                size: 10px
-                text:
-                    font:
-                        family: Roboto
-                        weight: 400
-                        size: [[2,28px],[8,24px]]
-                        fill: [0.149,0.149,0.152,1.0]
-                        order: 10
-            text:
-                order: 101
-                font:
+        _capitals:
+            filter: { country_capital: true, kind_detail: city, $zoom: { min:5 }  }
+            draw:
+                icons:
+                    order: 200
                     size: 10px
-                    fill: black
+                    text:
+                        font:
+                            family: Roboto
+                            weight: 400
+                            size: [[2,28px],[8,24px]]
+                            fill: [0.149,0.149,0.152,1.0]
+                            order: 10
+                text:
+                    order: 201
+                    font:
+                        size: 10px
+                        fill: black
+        _cities:
+            filter: { country_capital: false, kind_detail: city  }
+            draw:
+                icons:
+                    order: 100
+                    size: 10px
+                    text:
+                        font:
+                            family: Roboto
+                            weight: 400
+                            size: [[2,28px],[8,24px]]
+                            fill: [0.149,0.149,0.152,1.0]
+                            order: 10
+                text:
+                    order: 101
+                    font:
+                        size: 10px
+                        fill: black
+    _roadsLayer:
+        data:
+            source: mapzen
+            layer: roads
+        _highways:
+            filter: { kind: highway, kind_detail: motorway }
+            draw:
+                lines:
+                    order: 4
+                    color: [1.000,0.747,0.442,1.0]
+                    width: [[5,1px],[8,2px],[11,2.15px],[15,2.75px]]
+                    outline:
+                        color: [0.707,0.527,0.312,1.0]
+                        width: [[5,0px],[9,0.5px],[11,.75px],[15,1.5px]]
+        _majorRoad:
+            filter: { kind: major_road, $zoom: { min: 9 } }
+            draw:
+                lines:
+                    order: 3
+                    color: [0.949, 0.780, 0.576, 1.00]
+                    width: [[9,.75px],[13,2.25px],[15,2.5px]]
+        _minorRoad:
+            filter: { kind: minor_road, $zoom: { min: 13 } }
+            draw:
+                lines:
+                    order: 3
+                    color: [0.812, 0.796, 0.773, 1.00]
+                    width: [[13,.75px],[15,1.25px],[17,2.5px]]
+    _buildingsLayer:
+        data:
+            source: mapzen
+            layer: buildings
+        draw:
+            polygons:
+                order: 4
+                color: [0.859,0.855,0.854,1.0]
+                extrude: true
 styles:
     icons:
         base: points
         blend_order: 1
         texture: pois
+    dashed:
+        base: lines
+        dash: [2,1]
