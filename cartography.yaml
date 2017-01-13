@@ -4,7 +4,7 @@ sources:
         url: https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson
 scene:
     background:
-        color: white
+        color: [1.000,0.923,0.844,1.0]
 fonts:
     Lora:
         - weight: 700
@@ -12,40 +12,27 @@ fonts:
         - weight: 700
           style: italic
           url: https://fonts.gstatic.com/s/lora/v9/_IxjUs2lbQSu0MyFEAfa7ZBw1xU1rKptJj_0jans920.woff2
-    Roboto:
-        - weight: 400
-          url: https://fonts.gstatic.com/s/roboto/v15/CrYjSnGjrRCn0pd9VQsnFOvvDin1pK8aKteLpeZ5c0A.woff
-        - weight: 500
-          style: italic
-          url: https://fonts.gstatic.com/s/roboto/v15/OLffGBTaF0XFOW1gnuHF0brIa-7acMAeDBVuclsi6Gc.woff
 textures:
     city:
         url: https://raw.githubusercontent.com/tangrams/cartography-docs/master/img/sprite/bubble-wrap-style/2x/townspot-s-rev.png
     capital:
         url: https://raw.githubusercontent.com/tangrams/cartography-docs/master/img/sprite/bubble-wrap-style/2x/capital-m.png
 layers:
-    _earthLayer:
+    _earthLabels:
         data:
             source: mapzen
             layer: earth
+        filter:
+            all:
+                - kind: [continent]
+                - name: true
+                - $zoom: { max: 5 }
         draw:
-            polygons:
-                order: 0
-                color: [1.000,0.923,0.844,1.0]
-        _earthLabels:
-            filter:
-                all:
-                    - kind: [continent]
-                    - name: true
-                    - $zoom: { max: 5 }
-            draw:
-                text:
-                    font:
-                        family: Roboto
-                        style: italic
-                        size: [[1,18px],[2,20px],[3,24px],[4,32px]]
-                        fill: [0.776, 0.655, 0.565, 1.00]
-                        transform: uppercase
+            text:
+                font:
+                    size: [[1,18px],[2,20px],[3,24px],[4,32px]]
+                    fill: [0.776, 0.655, 0.565, 1.00]
+                    transform: uppercase
     _waterLayer:
         data:
             source: mapzen
@@ -126,6 +113,7 @@ layers:
                          - $zoom: { min: 3 }
                  draw:
                      text:
+                         priority: 1
                          text_source: function() { return feature["name:en"] || feature["name"]; }
                          font:
                              family: Lora
@@ -143,6 +131,7 @@ layers:
                         - $zoom: { min: 4 }
                  draw:
                      text:
+                         priority: 1
                          text_source: function() { return feature["name:en"] || feature["name"]; }
                          font:
                              family: Lora
@@ -226,16 +215,14 @@ layers:
             source: mapzen
             layer: places
         _capitals:
-            filter: { country_capital: true, kind: locality }
+            filter: { country_capital: true, kind: locality, $zoom: { min: 4 }  }
             draw:
                 capital:
                     order: 200
-                    priority: 1
+                    priority: 2
                     size: 12px
                     text:
                         font:
-                            family: Roboto
-                            weight: 400
                             size: [[2,10px],[8,24px]]
                             fill: [0.149,0.149,0.152,1.0]
                             order: 10
@@ -244,12 +231,10 @@ layers:
             draw:
                 city:
                     order: 100
-                    priority: 2
+                    priority: 3
                     size: 8px
                     text:
                         font:
-                            family: Roboto
-                            weight: 400
                             size: [[2,8px],[8,20px]]
                             fill: [0.149,0.149,0.152,1.0]
                             order: 10
@@ -266,7 +251,7 @@ layers:
                     width: [[5,1px],[8,2px],[11,2.15px],[15,2.75px]]
                     outline:
                         color: [0.707,0.527,0.312,1.0]
-                        width: [[5,0px],[9,0.5px],[11,.75px],[15,1.5px]]
+                        width: [[5,0px],[9,1px],[11,.75px],[15,1.5px]]
         _majorRoad:
             filter: { kind: major_road, $zoom: { min: 9 } }
             draw:
