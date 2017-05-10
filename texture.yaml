@@ -4,6 +4,8 @@ sources:
         type: TopoJSON
         url:  https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
         max_zoom: 16
+        url_params:
+          api_key: 'mapzen-ekzhA5x'
 layers:
     water:
         data: { source: mapzen }
