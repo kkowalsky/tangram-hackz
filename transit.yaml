@@ -1,0 +1,25 @@
+# Maptime SF: Working with Transitland
+# May 16, 2017
+
+# imports the Bubble Wrap map style
+import: https://mapzen.com/carto/bubble-wrap-style/6/bubble-wrap-style.zip
+
+# add a transit source
+sources:
+    _bus12:
+        type: GeoJSON
+        # result from Transitland query
+        url: https://transit.land/api/v1/routes.geojson?onestop_id=r-9q9p3-12
+
+layers:
+    _bus12:
+        data:
+            source: _bus12
+        draw:
+            #style this data as a line feature
+            lines:
+                #add line width
+                width: 15px
+                color: [0.208, 0.776, 0.867, 0.52]
+                #add order to draw on top of basemap
+                order: 3000
