@@ -36,12 +36,12 @@
     <script>
         var map = L.map('map');
         var layer = Tangram.leafletLayer({
-            scene: 'transit.yaml',
+            scene: 'terrain.yaml',
             attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>'
         });
         layer.addTo(map);
         var hash = new L.Hash(map);
-        map.setView([37.70531887544228, -122.22], 15);
+        map.setView([37.70531887544228, -122.22], 10);
     </script>
 
   </body>
